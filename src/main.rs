@@ -12,7 +12,7 @@ impl Stats
     fn roll_command(&self, target: u8)
     {
         let roll = 10 + self.command;
-        println!("Rolling Command: {} vs. Challenge Rating: {}", roll, target);
+        println!("TESTING: Rolling Command: {} vs. Challenge Rating: {}", roll, target);
         if roll >= target
         {
             println!("Success!");
@@ -29,6 +29,7 @@ struct System
     name: String,
     bodies: u32,
     faction: String,
+    description: String,
 }
 
 struct StarSystem
@@ -56,10 +57,23 @@ fn main()
     let mut game_state = GameState
     {
         player: Stats {command: 0, tactical: 0, operations: 0},
-        ring: System {name: String::from("Ring"), bodies: 1, faction: String::from("Interworld")},
+        ring: System 
+        {
+            name: String::from("Ring"), 
+            bodies: 1, 
+            faction: String::from("Inner System"),
+            description: String::from
+            (
+                "Formerly the planet Medon, during the Interworld War both sides\n
+                targeted the planet with devastating Terror-class weapons. The\n 
+                shattered remnants of the planet and its moon were engineered into\n
+                a somewhat habitable ringworld structure. The final segment of the\n
+                ring is set to be completed just before the Interworld War's centennial.\n"
+            ),
+        },
     };
 
-    let quit = false;
+    let quit: bool = false;
     while quit == false
     {
         game_state.player.roll_command(15);
@@ -113,8 +127,6 @@ fn chargen(game_state: &mut GameState)
         }
 
         // println!("The value of choice: {}", choice);
-    
-        
     }
     
 }
