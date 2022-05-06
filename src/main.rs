@@ -2,7 +2,8 @@ use std::io;
 use std::io::Write; 
 
 mod structures;
-pub use crate::structures::*;
+pub use crate::structures::Stats;
+pub use crate::structures::Starship;
 
 struct System
 {
@@ -17,18 +18,12 @@ struct StarSystem
     ring: System,
 }
 
-struct Starship
-{
-    name: String,
-    crew: u32,
-    cargo: Vec<String>,
-}
-
 struct GameState
 {
     state: u32,
     player: Stats,
     ring: System,
+    ship: Starship,
 }
 
 fn main() 
@@ -46,6 +41,12 @@ fn main()
             faction: String::from("Inner System"),
             description: String::from("Formerly the planet Medon, during the Interworld War both sides \ntargeted the planet with devastating Terror-class weapons. The \nshattered remnants of the planet and its moon were engineered into \na somewhat habitable ringworld structure. The final segment of the \nring is set to be completed just before the Interworld War's centennial.\n"),
         },
+        ship: Starship
+        {
+            name: String::from("ISS Worthwhile Endeavour"),
+            crew: 250,
+            cargo: vec!["Disruptor Gun".to_string()],
+        }
     };
 
     let quit: bool = false;
@@ -60,7 +61,7 @@ fn main()
         {
             println!("ORBITING THE RING | Postwar Year 88\n");
             println!("{}", game_state.ring.description);
-            let menu_options = ["a. Astrogation", "c. Communications", "e. Engineering", "s. Science", "y. Security", "g. Cargo", "o. Officers", "r. Crew"];
+            let menu_options = ["b. Bridge", "a. Astrogation", "c. Communications", "e. Engineering", "s. Science", "y. Security", "g. Cargo", "o. Officers", "r. Crew"];
             menu(&mut game_state, &menu_options);
         }
     }
@@ -123,10 +124,28 @@ fn menu(game_state: &mut GameState, menu_options: &[&str])
         {
             println!("{}", option);
         }
+        let selection = prompt("Your Orders?".to_string());
+        if selection == 'a'
+        {
+            game_state.ship.astrogation();
+        }
+        if selection == 'b'
+        {
+            game_state.ship.bridge();
+        }
+    }
+}
+
+fn prompt(query: String) -> char
+{
+    println!("{}", query);
+    let mut selection = String::new();
+    loop
+    {
         io::stdin().read_line(&mut selection).expect("Readline failed!");
         let selection: char = match selection.trim().parse()
         {
-            Ok(char) => char,
+            Ok(char) => return char,
             Err(_) => continue,
         };
     }
