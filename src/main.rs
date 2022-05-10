@@ -1,22 +1,47 @@
 use std::io; 
 use std::io::Write; 
 
-mod structures;
-pub use crate::structures::Stats;
-pub use crate::structures::Starship;
+mod statistics;
+mod world;
+mod starship;
+pub use crate::statistics::Stats;
+pub use crate::world::System;
+pub use crate::world::StarSystem;
+pub use crate::starship::Starship;
 
-struct System
-{
-    name: String,
-    bodies: u32,
-    faction: String,
-    description: String,
-}
+const TITLE: &str = r"
+ __  .__   __. .___________. _______ .______     ____    __    ____  ______   .______       __       _______  
+|  | |  \ |  | |           ||   ____||   _  \    \   \  /  \  /   / /  __  \  |   _  \     |  |     |       \ 
+|  | |   \|  | `---|  |----`|  |__   |  |_)  |    \   \/    \/   / |  |  |  | |  |_)  |    |  |     |  .--.  |
+|  | |  . `  |     |  |     |   __|  |      /      \            /  |  |  |  | |      /     |  |     |  |  |  |
+|  | |  |\   |     |  |     |  |____ |  |\  \----.  \    /\    /   |  `--'  | |  |\  \----.|  `----.|  '--'  |
+|__| |__| \__|     |__|     |_______|| _| `._____|   \__/  \__/     \______/  | _| `._____||_______||_______/ 
+                                                                                                               ";
 
-struct StarSystem
-{
-    ring: System,
-}
+const CRAWL: &str = 
+"
+              .   88 years ago, a war between the six worlds  .        .     .
+                 of the Zolar star system threatenend the lives     .  .
+     .       .  of billions of sentient beings, and lead to the            .
+.        .     destruction of entire planets.                           .
+   .            On one side, the Inner System Alliance opposing    .      .
+             the Outer Rim Powers - the reasoning for the war 
+          . myriad but also superficial, both sides suffered losses .   .
+   .       almost unimaginable. Vast fleets, overwhelming armies, and        .  .
+.      .  death reigned for ten long years, with no hope in sight.     .             .
+    .      Until, eventually, with the dead too numerous to count, the   .    .
+.      war was brought to an end with the signing of the Armstice. Many    .
+    . observers in the Six Worlds thought the peace only temporary -
+     with a second war merely on the horizon.                                    .
+       To that end, the Alliance and the Rim came together to form an org-   .
+ . anization dedicated to the prospect of promoting peace and cooperation
+  between all of the major worlds of the Zolar star system. For 88 years,
+ this Interworld Service has maintained a fragile peace. Until now.
+    As the captain of the Interworld Service Starship Worthwhile Endeavour,
+charged with preventing a second Interworld War, you must decide how to best
+prevent another conflict from embroiling the star system in bloodshed once
+again. However, mysterious powers on the edges of known space have machinations
+all their own...      \n";
 
 struct GameState
 {
@@ -26,10 +51,10 @@ struct GameState
     ship: Starship,
 }
 
-fn main() 
+fn main()
 {
-    println!("Welcome to the Interworld Service, captain.");
-
+    print!("{}[2J", 27 as char); // Clear terminal screen
+    print!("{esc}[2J{esc}[1;1H", esc = 27 as char); // Set cursor to Row 1, Column 1
     let mut game_state = GameState
     {
         state: 0,
@@ -48,21 +73,42 @@ fn main()
             cargo: vec!["Disruptor Gun".to_string()],
         }
     };
+    
+    println!("{}", TITLE);
 
-    let quit: bool = false;
+    let mut quit: bool = false;
     while quit == false
     {
         while game_state.state == 0
         {
-            game_state.player.roll_command(15);
+            let main_menu = ["n. New Game", "q. Quit"];
+            menu(&main_menu);
+            let main_selection = prompt("Selection: ".to_string());
+            if main_selection == 'n'
+            {
+                println!("{}", CRAWL);
+                game_state.state = 1;
+            }
+            if main_selection == 'q'
+            {
+                quit = true;
+                break;
+            }
+        }
+        
+        while game_state.state == 1
+        {
+            // game_state.player.roll_command(15);
+            println!("CHARACTER GENERATION");
             chargen(&mut game_state);
         }
-        while game_state.state == 1
+        while game_state.state == 2
         {
             println!("ORBITING THE RING | Postwar Year 88\n");
             println!("{}", game_state.ring.description);
-            let menu_options = ["b. Bridge", "a. Astrogation", "c. Communications", "e. Engineering", "s. Science", "y. Security", "g. Cargo", "o. Officers", "r. Crew"];
-            menu(&mut game_state, &menu_options);
+            let menu_options = ["a. Astrogation", "b. Bridge", "c. Communications", "e. Engineering", "s. Science", "y. Security", "g. Cargo", "o. Officers", "r. Crew", "z. Captain's Quarters"];
+            menu(&menu_options);
+            prompt("Orders: ".to_string());
         }
     }
 }
@@ -73,23 +119,15 @@ fn chargen(game_state: &mut GameState)
     println!("Assign a point by typing a, b, or c. Type ? for help.\n");
     while points > 0
     {
-        let mut choice = String::new(); 
         println!
         (
-            "a. Command: {}\nb. Tactical: {}\nc. Operations: {}\nPoints Left: {}",
+            "\na. Command: {}\nb. Tactical: {}\nc. Operations: {}\nPoints Left: {}",
             game_state.player.command,
             game_state.player.tactical,
             game_state.player.operations,
             points, 
         );
-        print!("Selection: ");
-        io::stdout().flush().unwrap();
-        io::stdin().read_line(&mut choice).expect("Readline failed!");
-        let choice: char = match choice.trim().parse()
-        {
-            Ok(char) => char,
-            Err(_) => continue,
-        };
+        let choice = prompt("Selection: ".to_string()); 
         if choice == 'a'
         {
             game_state.player.command += 1;
@@ -107,43 +145,33 @@ fn chargen(game_state: &mut GameState)
         }
         if choice =='?'
         {
-            println!("Command represents leadership ability and charisma.\nTactical represents lethality and skill in combat.\nOperations represents scientific knowledge and technical ability.\n");
+            println!("Command represents leadership ability and charisma.\nTactical represents lethality and skill in combat.\nOperations represents scientific knowledge and technical knowhow.\n");
         }
 
         // println!("The value of choice: {}", choice);
     }
-    game_state.state = 1;
+    // let life_path == false;
+
+    game_state.state = 2;
 }
 
-fn menu(game_state: &mut GameState, menu_options: &[&str])
+fn menu(menu_options: &[&str])
 {
-    loop
+    for option in menu_options
     {
-        let mut selection = String::new();
-        for option in menu_options
-        {
-            println!("{}", option);
-        }
-        let selection = prompt("Your Orders?".to_string());
-        if selection == 'a'
-        {
-            game_state.ship.astrogation();
-        }
-        if selection == 'b'
-        {
-            game_state.ship.bridge();
-        }
+        println!("{}", option);
     }
 }
 
 fn prompt(query: String) -> char
 {
-    println!("{}", query);
-    let mut selection = String::new();
+    print!("{}", query);
+    io::stdout().flush().unwrap();
+    let mut _selection = String::new();
     loop
     {
-        io::stdin().read_line(&mut selection).expect("Readline failed!");
-        let selection: char = match selection.trim().parse()
+        io::stdin().read_line(&mut _selection).expect("Readline failed!");
+        let _selection: char = match _selection.trim().parse()
         {
             Ok(char) => return char,
             Err(_) => continue,
