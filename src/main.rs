@@ -4,9 +4,12 @@ use std::io;
 use std::io::Read;
 use std::io::Write; 
 
+mod encounters;
+mod menus;
+mod starship;
 mod statistics;
 mod world;
-mod starship;
+
 pub use crate::statistics::Stats;
 pub use crate::world::System;
 pub use crate::world::StarSystem;
@@ -32,7 +35,7 @@ struct GameState
 
 fn main()
 {
-    let crawl: String = fs::read_to_string("ascii_art.txt").expect("Error reading file!");
+    let crawl: String = fs::read_to_string("art.txt").expect("Error reading file!");
 
     print!("{}[2J", 27 as char); // Clear terminal screen
     print!("{esc}[2J{esc}[1;1H", esc = 27 as char); // Set cursor to Row 1, Column 1
@@ -64,7 +67,7 @@ fn main()
         {
             let main_menu = ["n. New Game", "q. Quit"];
             menu(&main_menu);
-            let main_selection = prompt("Selection: ".to_string());
+            let main_selection = prompt("Selection: ");
             if main_selection == 'n'
             {
                 println!("{}", crawl);
@@ -91,7 +94,13 @@ fn main()
             println!("{}", game_state.ring.description);
             let menu_options = ["a. Astrogation", "b. Bridge", "c. Communications", "e. Engineering", "s. Science", "y. Security", "g. Cargo", "o. Officers", "r. Crew", "z. Captain's Quarters"];
             menu(&menu_options);
-            prompt("Orders: ".to_string());
+            let game_selection = prompt("Orders: ");
+            if game_selection == 'a'
+            {
+                Starship::astrogation();
+            }
+        
+        
         }
     }
 }
@@ -99,9 +108,9 @@ fn main()
 fn chargen(game_state: &mut GameState)
 {
     let mut points: u8 = 10;
-    println!("Assign a point by typing a, b, or c. Type ? for help.\n");
     while points > 0
     {
+        println!("Assign a point by typing a, b, or c. Type ? for help.\n");
         println!
         (
             "\na. Command: {}\nb. Tactical: {}\nc. Operations: {}\nPoints Left: {}",
@@ -110,7 +119,7 @@ fn chargen(game_state: &mut GameState)
             game_state.player.operations,
             points, 
         );
-        let choice = prompt("Selection: ".to_string()); 
+        let choice = prompt("Selection: "); 
         if choice == 'a'
         {
             game_state.player.command += 1;
@@ -131,13 +140,8 @@ fn chargen(game_state: &mut GameState)
             println!("Command represents leadership ability and charisma.\nTactical represents lethality and skill in combat.\nOperations represents scientific knowledge and technical knowhow.\n");
         }
 
-        // Clears screen
-        // std::process::Command::new("clear").status().unwrap(); // Linux Command 
-        // std::process::Command::new("cls").status().unwrap(); // Windows Command
         clear_screen();
 
-
-        // println!("The value of choice: {}", choice);
     }
     // let life_path == false;
 
@@ -152,7 +156,7 @@ fn menu(menu_options: &[&str])
     }
 }
 
-fn prompt(query: String) -> char
+fn prompt(query: &str) -> char
 {
     print!("{}", query);
     io::stdout().flush().unwrap();
@@ -186,7 +190,7 @@ fn pause()
     let mut stdout = io::stdout();
 
     // We want the cursor to stay at the end of the line, so we print without a newline and flush manually.
-    write!(stdout, "Press any key to continue...").unwrap();
+    write!(stdout, "Press ENTER to continue...").unwrap();
     stdout.flush().unwrap();
 
     // Read a single byte and discard
