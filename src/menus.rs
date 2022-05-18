@@ -5,13 +5,22 @@ use crate::prompt;
 //     fn menu(&self, items: &[&str], options: &[&str]);
 // }
 
-pub struct MenuItem
+pub struct MenuItem<'a>
 {
     pub order_number: u8,
     pub character: char,
-    pub name: String,
+    pub name: &'a str,
     pub process: String,
 }
+
+impl MenuItem<'_>
+{
+    fn process(&self)
+    {
+        println!("{}", self.process);
+    }
+}
+
 
 pub fn menu(items: &[MenuItem], quantity: u8)
 {
@@ -20,6 +29,8 @@ pub fn menu(items: &[MenuItem], quantity: u8)
     {
         println!("{}. {}", item.character, item.name);
     }
+    
+    // Get selection
     loop
     {
         let selection = prompt("Selection: ");
@@ -27,8 +38,9 @@ pub fn menu(items: &[MenuItem], quantity: u8)
         {
             if selection == item.character
             {
-                println!("{}", item.process);
+                item.process()
             }
         }
     }
 }
+

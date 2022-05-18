@@ -2,6 +2,7 @@
 use crate::menus::MenuItem;
 use crate::menus::menu;
 
+
 pub struct Starship
 {
     pub name: String,
@@ -34,13 +35,18 @@ impl Starship
     
         let astro_menu = 
         [
-            MenuItem {order_number: 0, character: 's', name: "Starmap".to_string(), process: "Zolar Star System".to_string()},
-            MenuItem {order_number: 1, character: 'n', name: "Navigate".to_string(), process: "Course Selection".to_string()},
-            MenuItem {order_number: 2, character: 'o', name: "Orbit".to_string(), process: "Orbital Body".to_string()}
+            MenuItem {order_number: 0, character: 's', name: "Starmap", process: "Zolar Star System".to_string()},
+            MenuItem {order_number: 1, character: 'n', name: "Navigate", process: "Course Selection".to_string()},
+            MenuItem {order_number: 2, character: 'o', name: "Orbit", process: "Orbital Body".to_string()}
         ];
-
         menu(&astro_menu, 3);
-
-    
     }
 }
+
+// impl Process for Starship
+// {
+//     fn do_thingy(&self)
+//     {
+//         println!("Thingy Done.");
+//     }
+// }

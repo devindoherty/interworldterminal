@@ -37,8 +37,9 @@ fn main()
 {
     let crawl: String = fs::read_to_string("art.txt").expect("Error reading file!");
 
-    print!("{}[2J", 27 as char); // Clear terminal screen
-    print!("{esc}[2J{esc}[1;1H", esc = 27 as char); // Set cursor to Row 1, Column 1
+    // print!("{}[2J", 27 as char); // Clear terminal screen
+    // print!("{esc}[2J{esc}[1;1H", esc = 27 as char); // Set cursor to Row 1, Column 1
+    clear_screen();
     let mut game_state = GameState
     {
         state: 0,
@@ -99,8 +100,6 @@ fn main()
             {
                 Starship::astrogation();
             }
-        
-        
         }
     }
 }
@@ -137,7 +136,9 @@ fn chargen(game_state: &mut GameState)
         }
         if choice =='?'
         {
+            clear_screen();
             println!("Command represents leadership ability and charisma.\nTactical represents lethality and skill in combat.\nOperations represents scientific knowledge and technical knowhow.\n");
+            continue;
         }
 
         clear_screen();
