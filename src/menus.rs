@@ -1,4 +1,5 @@
 use crate::prompt;
+use crate::Starship;
 
 // pub trait Menus
 // {
@@ -17,7 +18,29 @@ impl MenuItem<'_>
 {
     fn process(&self)
     {
-        println!("{}", self.process);
+        if self.name == "Starmap"
+        {
+            let starmap: &str = r"
+          ~+
+                 *       +
+           '                  |
+       ()    .-.,==``==.    - o -
+             '=/_       \     |
+          *   |  '=._    |
+               \     `=./`,        '
+            .   '=.__.=' `='      *
+   +                         +
+        O      *        '       .";
+            println!("{}", starmap);
+        }
+        if self.name == "Back"
+        {
+            Starship::astrogation();
+        }
+        else
+        {
+            println!("{}", self.process);
+        }
     }
 }
 

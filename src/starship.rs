@@ -37,7 +37,8 @@ impl Starship
         [
             MenuItem {order_number: 0, character: 's', name: "Starmap", process: "Zolar Star System".to_string()},
             MenuItem {order_number: 1, character: 'n', name: "Navigate", process: "Course Selection".to_string()},
-            MenuItem {order_number: 2, character: 'o', name: "Orbit", process: "Orbital Body".to_string()}
+            MenuItem {order_number: 2, character: 'o', name: "Orbit", process: "Orbital Body".to_string()},
+            MenuItem {order_number: 3, character: 'x', name: "Back", process: "Test".to_string()},
         ];
         menu(&astro_menu, 3);
     }
