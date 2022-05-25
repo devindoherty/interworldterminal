@@ -12,7 +12,7 @@ mod world;
 
 pub use crate::statistics::Stats;
 pub use crate::world::System;
-pub use crate::world::StarSystem;
+// pub use crate::world::StarSystem;
 pub use crate::starship::Starship;
 
 const TITLE: &str = r"
@@ -25,17 +25,18 @@ const TITLE: &str = r"
                                                                                                                ";
 
 
-struct GameState
+struct GameState<'a>
 {
     state: u32,
     player: Stats,
     ring: System,
-    ship: Starship,
+    ship: Starship<'a>,
+    // starsystem: Vec<System>,
 }
 
 fn main()
 {
-    let crawl: String = fs::read_to_string("art.txt").expect("Error reading file!");
+    let crawl: String = fs::read_to_string("art/crawl_art.txt").expect("Error reading file!");
 
     // print!("{}[2J", 27 as char); // Clear terminal screen
     // print!("{esc}[2J{esc}[1;1H", esc = 27 as char); // Set cursor to Row 1, Column 1
@@ -55,7 +56,7 @@ fn main()
         {
             name: String::from("ISS Worthwhile Endeavour"),
             crew: 250,
-            cargo: vec!["Disruptor Gun".to_string()],
+            cargo: vec!["Ender Eggs"],
         }
     };
     
@@ -66,7 +67,7 @@ fn main()
     {
         while game_state.state == 0
         {
-            let main_menu = ["n. New Game", "q. Quit"];
+            let main_menu = ["n. New Game", "l. Load Game (NOT IMPLEMENTED)", "q. Quit"];
             menu(&main_menu);
             let main_selection = prompt("Selection: ");
             if main_selection == 'n'
@@ -75,6 +76,11 @@ fn main()
                 pause();
                 clear_screen();
                 game_state.state = 1;
+            }
+            if main_selection == 'l'
+            {
+                println!("What are ya, some kinda wiseguy?");
+                continue;
             }
             if main_selection == 'q'
             {
@@ -173,13 +179,29 @@ fn prompt(query: &str) -> char
     }
 }
 
+fn freeform_prompt(query: &str) -> String
+{
+    print!("{}", query);
+    io::stdout().flush().unwrap();
+    let mut _selection = String::new();
+    loop
+    {
+        io::stdin().read_line(&mut _selection).expect("Readline failed!");
+        let _selection: String = match _selection.trim().parse()
+        {
+            Ok(String) => return String,
+            Err(_) => continue,
+        };
+    }
+}
+
 fn clear_screen()
 {
     if cfg!(target_os = "linux") || cfg!(target_os = "macos")
     {
         std::process::Command::new("clear").status().unwrap();
     }
-    else // if cfg!(target_os = "windows")
+    if cfg!(target_os = "windows")
     {
         std::process::Command::new("cls").status().unwrap();
     }

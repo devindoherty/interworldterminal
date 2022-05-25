@@ -6,7 +6,10 @@ pub struct System
     pub description: String,
 }
 
-pub struct StarSystem
-{
-    pub ring: System,
-}
+
+
+// pub struct StarSystem
+// {
+//     pub ring: System,
+// }
+

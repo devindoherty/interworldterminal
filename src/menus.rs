@@ -11,42 +11,18 @@ pub struct MenuItem<'a>
     pub order_number: u8,
     pub character: char,
     pub name: &'a str,
-    pub process: String,
+    pub process: fn(),
 }
 
 impl MenuItem<'_>
 {
-    fn process(&self)
-    {
-        if self.name == "Starmap"
-        {
-            let starmap: &str = r"
-          ~+
-                 *       +
-           '                  |
-       ()    .-.,==``==.    - o -
-             '=/_       \     |
-          *   |  '=._    |
-               \     `=./`,        '
-            .   '=.__.=' `='      *
-   +                         +
-        O      *        '       .";
-            println!("{}", starmap);
-        }
-        if self.name == "Back"
-        {
-            Starship::astrogation();
-        }
-        else
-        {
-            println!("{}", self.process);
-        }
-    }
-}
 
+}
 
 pub fn menu(items: &[MenuItem], quantity: u8)
 {
+    let mut menu_history: Vec<fn()> = Vec::new();
+
     // Display menu
     for item in items
     {
@@ -61,7 +37,8 @@ pub fn menu(items: &[MenuItem], quantity: u8)
         {
             if selection == item.character
             {
-                item.process()
+                (item.process)();
+                menu_history.push(item.process);
             }
         }
     }
