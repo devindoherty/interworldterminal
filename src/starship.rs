@@ -2,8 +2,9 @@ use std::fs;
 
 // pub use crate::menus::Menus;
 use crate::menus::MenuItem;
+use crate::main;
 use crate::menus::menu;
-use crate::{freeform_prompt, prompt};
+use crate::{freeform_prompt}; //, prompt};
 
 
 pub struct Starship<'a>
@@ -40,7 +41,7 @@ impl Starship<'_>
             MenuItem {order_number: 2, character: 'o', name: "Orbit", process: Starship::astrogation_orbit},
             MenuItem {order_number: 3, character: 'x', name: "Back", process: Starship::astrogation_back},
         ];
-        menu(&astro_menu, 3);
+        menu(&astro_menu, 3, &mut game_state);
     }
     
     pub fn astrogation_starmap()

@@ -1,5 +1,6 @@
 use crate::prompt;
 use crate::Starship;
+use crate::GameState;
 
 // pub trait Menus
 // {
@@ -19,9 +20,9 @@ impl MenuItem<'_>
 
 }
 
-pub fn menu(items: &[MenuItem], quantity: u8)
+
+pub fn menu(items: &[MenuItem], quantity: u8, game_state: &GameState)
 {
-    let mut menu_history: Vec<fn()> = Vec::new();
 
     // Display menu
     for item in items
@@ -38,7 +39,7 @@ pub fn menu(items: &[MenuItem], quantity: u8)
             if selection == item.character
             {
                 (item.process)();
-                menu_history.push(item.process);
+                game_state.menu_history.push(item.process);
             }
         }
     }

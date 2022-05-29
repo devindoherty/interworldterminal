@@ -1,4 +1,4 @@
-use std::env;
+// use std::env;
 use std::fs;
 use std::io; 
 use std::io::Read;
@@ -32,6 +32,7 @@ struct GameState<'a>
     ring: System,
     ship: Starship<'a>,
     // starsystem: Vec<System>,
+    menu_history: Vec<fn()>
 }
 
 fn main()
@@ -41,6 +42,7 @@ fn main()
     // print!("{}[2J", 27 as char); // Clear terminal screen
     // print!("{esc}[2J{esc}[1;1H", esc = 27 as char); // Set cursor to Row 1, Column 1
     clear_screen();
+    // let mut menu_history: Vec<fn()> = Vec::new();
     let mut game_state = GameState
     {
         state: 0,
@@ -57,7 +59,8 @@ fn main()
             name: String::from("ISS Worthwhile Endeavour"),
             crew: 250,
             cargo: vec!["Ender Eggs"],
-        }
+        },
+        menu_history: Vec::new()
     };
     
     println!("{}", TITLE);
@@ -189,7 +192,7 @@ fn freeform_prompt(query: &str) -> String
         io::stdin().read_line(&mut _selection).expect("Readline failed!");
         let _selection: String = match _selection.trim().parse()
         {
-            Ok(String) => return String,
+            Ok(string) => return string,
             Err(_) => continue,
         };
     }
